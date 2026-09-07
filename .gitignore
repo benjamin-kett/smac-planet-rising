@@ -1,0 +1,16 @@
+# Original installation and locally derived assets must never be published.
+/Alpha Centauri/
+/native/assets/
+/native/runtime/
+/native/test-runtime/
+/native/*.app/
+/native/*.log
+/native/*sample*.txt
+/native/upstream-glsmac.git/
+/research/upstream/
+**/.DS_Store
+**/__pycache__/
+*.pyc
+*.dSYM/
+.env
+.env.*

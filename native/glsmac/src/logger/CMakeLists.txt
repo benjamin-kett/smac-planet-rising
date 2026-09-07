@@ -1,0 +1,9 @@
+IF ( CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "FastDebug" )
+
+	SET( SRC ${SRC}
+
+		${PWD}/Stdout.cpp
+
+		PARENT_SCOPE )
+
+ENDIF ()

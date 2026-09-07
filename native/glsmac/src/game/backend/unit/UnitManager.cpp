@@ -4,6 +4,10 @@
 #include "Def.h"
 #include "StaticDef.h"
 #include "Unit.h"
+#include "UnitCatalog.h"
+#include "PrototypeCost.h"
+#include "engine/Engine.h"
+#include "resource/ResourceManager.h"
 
 #include "game/backend/Game.h"
 #include "game/backend/animation/AnimationManager.h"
@@ -266,6 +270,49 @@ void UnitManager::PushUpdates() {
 
 WRAPIMPL_BEGIN( UnitManager )
 	WRAPIMPL_PROPS
+		{
+			"get_rules",
+			NATIVE_CALL( this ) {
+				N_EXPECT_ARGS( 0 );
+				UnitCatalog catalog;
+				try {
+					catalog = UnitCatalog::Load( g_engine->GetResourceManager()->GetCustomPath( "alphax.txt" ) );
+				} catch ( const std::exception& error ) {
+					GSE_ERROR( gse::EC.GAME_ERROR, error.what() );
+				}
+				gse::value::array_elements_t designs, native_morale, conventional_morale;
+				for ( const auto& name : catalog.native_morale ) native_morale.push_back( VALUE( gse::value::String,, name ) );
+				for ( const auto& name : catalog.conventional_morale ) conventional_morale.push_back( VALUE( gse::value::String,, name ) );
+				for ( size_t i = 0; i < catalog.units.size(); ++i ) {
+					const auto& unit = catalog.units[i];
+					const auto& chassis = catalog.chassis[unit.chassis];
+					const auto& weapon = catalog.weapons[unit.weapon];
+					designs.push_back( VALUE( gse::value::Object, , GSE_CALL_NOGC, {
+						{ "index", VALUE( gse::value::Int,, i ) },
+						{ "name", VALUE( gse::value::String,, unit.name ) },
+						{ "chassis", VALUE( gse::value::Int,, unit.chassis ) },
+						{ "weapon", VALUE( gse::value::Int,, unit.weapon ) },
+						{ "armor", VALUE( gse::value::Int,, unit.armor ) },
+						{ "offense", VALUE( gse::value::Int,, weapon.offense ) },
+						{ "defense", VALUE( gse::value::Int,, catalog.armor[unit.armor].defense ) },
+						{ "role", VALUE( gse::value::Int,, weapon.mode ) },
+						{ "reactor", VALUE( gse::value::Int,, catalog.reactors[unit.reactor].power ) },
+						{ "triad", VALUE( gse::value::Int,, chassis.triad ) },
+						{ "chassis_speed", VALUE( gse::value::Int,, chassis.speed ) },
+						{ "range", VALUE( gse::value::Int,, chassis.range ) },
+						{ "abilities", VALUE( gse::value::Int,, unit.abilities ) },
+						{ "prerequisite", VALUE( gse::value::String,, unit.prerequisite ) },
+						{ "cost", VALUE( gse::value::Int,, unit.cost ? unit.cost : PrototypeCost( catalog, unit ) ) },
+					} ) );
+				}
+				Log( "Loaded Alien Crossfire unit rules: " + std::to_string( designs.size() ) + " designs" );
+				return VALUE( gse::value::Object, , GSE_CALL_NOGC, {
+					{ "units", VALUE( gse::value::Array,, designs ) },
+					{ "native_morale", VALUE( gse::value::Array,, native_morale ) },
+					{ "conventional_morale", VALUE( gse::value::Array,, conventional_morale ) },
+				} );
+			} )
+		},
 	WRAPIMPL_TRIGGERS
 		{
 			"define_moraleset",
@@ -390,6 +437,16 @@ WRAPIMPL_BEGIN( UnitManager )
 						if ( !moraleset ) {
 							GSE_ERROR( gse::EC.INVALID_CALL, "Morale type '" + morale + "' is not defined");
 						}
+						N_GETPROP_OPT( int, offense, unit_def, "offense", Int, -1 );
+						N_GETPROP_OPT( int, defense, unit_def, "defense", Int, -1 );
+						N_GETPROP_OPT( int, reactor, unit_def, "reactor", Int, 1 );
+						N_GETPROP_OPT( int, cost, unit_def, "cost", Int, 0 );
+						N_GETPROP_OPT( int, role, unit_def, "role", Int, 2 );
+						N_GETPROP_OPT( uint32_t, abilities, unit_def, "abilities", Int, 0 );
+						N_GETPROP_OPT( bool, is_native, unit_def, "is_native", Bool, true );
+						if ( offense < -1 || defense < -1 || reactor < 1 || reactor > 4 || cost < 0 || role < 0 || role > 14 ) {
+							GSE_ERROR( gse::EC.INVALID_CALL, "Invalid unit combat or role statistics" );
+						}
 						auto* def = new unit::StaticDef(
 							id,
 							moraleset,
@@ -408,6 +465,13 @@ WRAPIMPL_BEGIN( UnitManager )
 							)
 						);
 
+						def->m_offense = offense;
+						def->m_defense = defense;
+						def->m_reactor = reactor;
+						def->m_cost = cost;
+						def->m_role = role;
+						def->m_abilities = abilities;
+						def->m_is_native = is_native;
 						DefineUnit( def );
 
 						return VALUE( gse::value::Undefined );

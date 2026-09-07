@@ -93,7 +93,7 @@ public:
 
 	~Engine();
 	int Run();
-	void ShutDown();
+	void ShutDown( int exit_status = 0 );
 	void StopWorkerThreads();
 
 	config::Config* GetConfig() const { return m_config; }
@@ -119,6 +119,7 @@ public:
 private:
 
 	std::atomic< bool > m_is_shutting_down = false;
+	std::atomic< int > m_exit_status = 0;
 
 	std::vector< common::Thread* > m_threads = {};
 

@@ -30,6 +30,13 @@ public:
 	const movement_type_t m_movement_type;
 	const movement_t m_movement_per_turn;
 	const Render* m_render;
+	int m_offense = -1;
+	int m_defense = -1;
+	int m_reactor = 1;
+	int m_cost = 0;
+	int m_role = 2;
+	uint32_t m_abilities = 0;
+	bool m_is_native = true;
 
 	const movement_type_t GetMovementType() const override;
 

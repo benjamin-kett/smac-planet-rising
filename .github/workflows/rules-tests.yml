@@ -1,0 +1,18 @@
+name: Native rules tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  rules:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure synthetic rules tests with sanitizers
+        run: cmake -S native/glsmac/tests -B build-rules -DSMAC_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug
+      - name: Build
+        run: cmake --build build-rules --parallel 2
+      - name: Test
+        run: ctest --test-dir build-rules --output-on-failure

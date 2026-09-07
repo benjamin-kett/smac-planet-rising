@@ -51,6 +51,9 @@ private:
 	std::string m_id;
 	std::string m_name;
 	backend::unit::def_type_t m_type;
+	int m_offense = -1;
+	int m_defense = -1;
+	uint32_t m_abilities = 0;
 
 	typedef std::unordered_map< backend::unit::morale_t, sprite::Sprite > morale_based_sprites_t;
 

@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.13)
+project(smac_rules_tests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+option(SMAC_SANITIZE "Use address and undefined-behavior sanitizers" OFF)
+if(SMAC_SANITIZE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=address,undefined)
+endif()
+enable_testing()
+add_executable(unit_catalog_test unit_catalog_test.cpp
+    ../src/game/backend/unit/UnitCatalog.cpp
+    ../src/game/backend/unit/PrototypeCost.cpp)
+target_include_directories(unit_catalog_test PRIVATE ../src)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    target_compile_options(unit_catalog_test PRIVATE -Wall -Wextra -Werror)
+endif()
+add_test(NAME unit_catalog COMMAND unit_catalog_test)

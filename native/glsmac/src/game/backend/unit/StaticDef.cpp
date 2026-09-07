@@ -78,6 +78,13 @@ void StaticDef::Serialize( types::Buffer& buf, const StaticDef* def ) {
 	buf.WriteInt( def->m_movement_type );
 	buf.WriteFloat( def->m_movement_per_turn );
 	Render::Serialize( buf, def->m_render );
+	buf.WriteInt( def->m_offense );
+	buf.WriteInt( def->m_defense );
+	buf.WriteInt( def->m_reactor );
+	buf.WriteInt( def->m_cost );
+	buf.WriteInt( def->m_role );
+	buf.WriteInt( def->m_abilities );
+	buf.WriteBool( def->m_is_native );
 }
 
 StaticDef* StaticDef::Deserialize( types::Buffer& buf, const std::string& id, const std::string& moraleset_name, const std::string& name ) {
@@ -85,11 +92,26 @@ StaticDef* StaticDef::Deserialize( types::Buffer& buf, const std::string& id, co
 	const auto movement_per_turn = buf.ReadFloat();
 	const auto* moraleset = g_engine->GetGame()->GetUM()->GetMoraleSet( moraleset_name );
 	ASSERT( moraleset, "could not find morale set: " + moraleset_name );
-	return new StaticDef( id, moraleset, name, movement_type, movement_per_turn, Render::Deserialize( buf ) );
+	auto* def = new StaticDef( id, moraleset, name, movement_type, movement_per_turn, Render::Deserialize( buf ) );
+	def->m_offense = buf.ReadInt();
+	def->m_defense = buf.ReadInt();
+	def->m_reactor = buf.ReadInt();
+	def->m_cost = buf.ReadInt();
+	def->m_role = buf.ReadInt();
+	def->m_abilities = buf.ReadInt();
+	def->m_is_native = buf.ReadBool();
+	return def;
 }
 
 WRAPIMPL_BEGIN( StaticDef )
 	WRAPIMPL_PROPS
+			WRAPIMPL_GET_CUSTOM( "offense", Int, m_offense )
+			WRAPIMPL_GET_CUSTOM( "defense", Int, m_defense )
+			WRAPIMPL_GET_CUSTOM( "reactor", Int, m_reactor )
+			WRAPIMPL_GET_CUSTOM( "cost", Int, m_cost )
+			WRAPIMPL_GET_CUSTOM( "role", Int, m_role )
+			WRAPIMPL_GET_CUSTOM( "abilities", Int, m_abilities )
+			WRAPIMPL_GET_CUSTOM( "is_native", Bool, m_is_native )
 			WRAPIMPL_GET_CUSTOM( "is_immovable", Bool, m_movement_type == MT_IMMOVABLE )
 			WRAPIMPL_GET_CUSTOM( "is_land", Bool, m_movement_type == MT_LAND )
 			WRAPIMPL_GET_CUSTOM( "is_water", Bool, m_movement_type == MT_WATER )

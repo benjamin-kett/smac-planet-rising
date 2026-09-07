@@ -209,7 +209,7 @@ int Engine::Run() {
 		m_error_handler->HandleError( e );
 	}
 
-	return result;
+	return result == EXIT_SUCCESS ? m_exit_status.load() : result;
 }
 
 void Engine::StopWorkerThreads() {
@@ -228,7 +228,8 @@ void Engine::StopWorkerThreads() {
 	}
 }
 
-void Engine::ShutDown() {
+void Engine::ShutDown( const int exit_status ) {
+	if ( exit_status != EXIT_SUCCESS ) m_exit_status.store( exit_status );
 
 	if ( m_is_shutting_down.exchange( true ) ) {
 		return;

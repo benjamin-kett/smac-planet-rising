@@ -21,6 +21,9 @@ UnitDef::UnitDef( sprite::InstancedSpriteManager* ism, const backend::unit::Def*
 	switch ( unitdef->m_type ) {
 		case backend::unit::DT_STATIC: {
 			const auto* def = (backend::unit::StaticDef*)unitdef;
+			m_offense = def->m_offense;
+			m_defense = def->m_defense;
+			m_abilities = def->m_abilities;
 
 			switch ( def->m_render->m_type ) {
 
@@ -54,7 +57,7 @@ UnitDef::~UnitDef() {
 }
 
 const bool UnitDef::IsArtillery() const {
-	return m_id != "SporeLauncher";
+	return (m_abilities & (1u << 15)) != 0;
 }
 
 sprite::Sprite* UnitDef::GetSprite( const backend::unit::morale_t morale ) {
@@ -135,14 +138,10 @@ const std::string UnitDef::GetNameString() const {
 }
 
 const std::string UnitDef::GetStatsString() const {
-	std::string str = "";
-	if ( m_id == "SporeLauncher" ) {
-		str += "(?)";
-	}
-	else {
-		str += "?";
-	}
-	return str + " - ? - " + util::String::ApproximateFloat( static_.movement_per_turn );
+	std::string offense = m_offense < 0 ? "?" : std::to_string( m_offense );
+	if ( IsArtillery() ) offense = "(" + offense + ")";
+	const std::string defense = m_defense < 0 ? "?" : std::to_string( m_defense );
+	return offense + " - " + defense + " - " + util::String::ApproximateFloat( static_.movement_per_turn );
 
 }
 

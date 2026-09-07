@@ -3,6 +3,11 @@
 /native/assets/
 /native/runtime/
 /native/test-runtime/
+/native/rules-tests-build/
+/research/ghidra/
+/research/decompiled/
+/native/inspection/
+/research/binary-inventory.json
 /native/*.app/
 /native/*.log
 /native/*sample*.txt

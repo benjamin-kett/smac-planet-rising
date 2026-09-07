@@ -57,10 +57,8 @@ a standalone distributable bundle. macOS 15.7.3 / Apple M1 Pro is the tested hos
 
 ## Known limitations observed during testing
 
-* The complete GSE script suite terminated with a segmentation fault after its
-  benchmark script; it did not pass. The isolated `empty.gls.js` smoke test
-  passed and exited with status 0. LLDB could not attach on this host, so the
-  full-suite crash remains undiagnosed.
+* The full GSE script suite now passes after fixing a GC race during script-engine
+  teardown. A deliberately failing test was verified to exit 1.
 * The in-game quit assertion was fixed by joining worker threads before freeing
   the shared script state. A new in-game quit exited 0; GC cleanup warnings remain.
 * Speaker output has not been independently recorded or verified. The expansion
@@ -70,3 +68,28 @@ a standalone distributable bundle. macOS 15.7.3 / Apple M1 Pro is the tested hos
 
 See `TESTING.md` for observed results and `../docs/PORT_COVERAGE.md` for the
 remaining engine requirements. Expansion assets do not establish expansion rules parity.
+
+## Rules and recovered code tests
+
+The unit catalog loads `alphax.txt` in native C++ and validates component references,
+prerequisites, counts and binary ability flags. The game currently instantiates
+only its existing sprite-backed native unit types; importing a design does not
+make its renderer or orders complete. Prototype cost is measured in mineral rows,
+before faction/difficulty/industry effects and the first-prototype surcharge.
+
+Run portable synthetic tests without game assets:
+
+```sh
+cmake -S native/glsmac/tests -B native/rules-tests-build -DSMAC_SANITIZE=ON
+cmake --build native/rules-tests-build
+ctest --test-dir native/rules-tests-build --output-on-failure
+```
+
+Compare the cost calculation with the pinned local Thinker checkout:
+
+```sh
+python3 tools/verify_prototype_cost.py research/upstream/thinker 'Alpha Centauri/alphax.txt'
+```
+
+The comparison covers 5,713,344 chassis/weapon/armor/reactor/ability combinations.
+It establishes correspondence with recovered source, not original-binary execution.

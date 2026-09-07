@@ -34,6 +34,7 @@ Space::~Space() {
 				it.second.cleanup();
 			}
 		}
+		m_pending_accumulations.clear();
 	}
 
 	m_collect_mutex.lock(); // wait for any ongoing collects to finish

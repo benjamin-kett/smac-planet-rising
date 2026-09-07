@@ -14,5 +14,7 @@ and animation atlases are not part of this source repository. Building the
 playable application requires a separately supplied installation.
 
 Thinker and OpenSMACX are research references recorded in `docs/ENGINEERING.md`.
-Their local checkouts are excluded from this repository; no claim is made that
-either is a complete portable game engine.
+Their local checkouts are excluded from this repository. `PrototypeCost.cpp`
+ports Thinker's reconstructed `mod_proto_cost` calculation to owned state;
+its MIT license is retained at `licenses/Thinker-MIT.txt`. No claim is made
+that either reference is a complete portable game engine.

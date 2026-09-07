@@ -29,7 +29,7 @@ complete rules, campaign, faction selection, AI, or save compatibility.
 * ARM64 compilation and linking succeeded.
 * `git diff --check` passed for the modified tracked engine sources.
 * Isolated GSE empty-script test: passed, exit 0 (`gse-smoke.log`).
-* Full GSE script suite: crashed, exit 139 (`gse-tests.log`).
+* Full GSE script suite initially crashed, exit 139 (`gse-tests.log`); the later fix and rerun are recorded below.
 * Earlier in-game quit: GC assertion; subsequently fixed as described below.
 * Movie audio stream is non-silent (mean -19.8 dB, peak -0.5 dB), but speaker
   output was not independently verified. Conversion logged a malformed source
@@ -64,3 +64,21 @@ Logs are local to `native/`. This is a development build with known failures.
 This verifies expansion startup assets and prototype selection/animation paths.
 It does not verify a playable Alien Crossfire campaign. See `PORT_COVERAGE.md`
 in `docs/` for the explicit remaining requirements.
+
+## Native unit rules and test reliability
+
+* `UnitCatalog` parsed both local editions: base 14 designs / 21 weapons / 10 armor /
+  24 abilities; expansion 23 designs / 26 weapons / 14 armor / 29 abilities.
+* Synthetic parser and cost cases pass with address/undefined-behavior sanitizers.
+* Differential test matched the pinned Thinker `mod_proto_cost` implementation for
+  5,713,344 combinations, including every single ability and ability pair. This
+  is not a differential test against execution of `terranx.exe`.
+* The native game logged `Loaded Alien Crossfire unit rules: 23 designs` and
+  rendered a Cybernetic Consciousness map after starting. Four existing unit
+  definitions now receive their stats through the native catalog.
+* Fixed a race in `GSE::~GSE`: its root containers were being cleared while the GC
+  thread traversed them. Full suite now reports `All tests passed.` and exits 0
+  (`gse-full-after-fix.log`). Cleared pending owner references during space teardown.
+* Fixed test exit-status propagation. An intentional `test.assert(false)` fixture
+  reports one failure and exits 1 (`gse-exit-status.log`).
+* Added synthetic unit-rules integration tests; these pass in the full suite.

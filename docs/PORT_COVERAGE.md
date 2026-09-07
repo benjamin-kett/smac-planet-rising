@@ -15,12 +15,12 @@ expansion's compiled rules. Thinker and OpenSMACX remain research references.
 | Landing | Original human/alien FLC frames followed by smoke, positioned on the starting tile | Correct starting roster, Progenitor arrival timing, sea starts and fidelity comparison |
 | Factions | Selected ID reaches backend; names, colors, base art and naval/alien flags | Complete faction bonuses, restrictions, initial techs and special mechanics |
 | World | Random map renders, units move, prototype bases and tile yields exist | Original generation, visibility and resource-rule parity |
-| Units | Four native-life definitions; new games use a placeholder mindworm | Conventional designs, colony pods, formers, rovers, aircraft, transports and expansion abilities |
+| Units | Native catalog imports all 23 expansion designs and component stats; four native-life types instantiated; new games still use a placeholder mindworm | Conventional designs, colony pods, formers, rovers, aircraft, transports and expansion abilities |
 | Bases/economy | Prototype growth, population and worked tiles | Production queues, facilities, projects, support, ecology and all economic rules |
 | Technology/social engineering | No complete gameplay implementation established | Research tree, prerequisites, unlocks, social choices and effects |
 | Diplomacy/AI | No complete campaign behavior | Diplomacy state/dialogue, AI turns and original behavior baseline before rebuilding policy |
 | Persistence/victory | No complete campaign validated | Save/reload continuity, victory conditions, game completion and compatibility policy |
-| Stability | One successful in-game exit after fixing worker teardown; focused startup tests pass | Resolve full GSE suite crash, GC cleanup warnings and broader gameplay failures |
+| Stability | In-game quit fixed; full GSE suite and sanitized rules tests pass | Resolve GC cleanup warnings and broader gameplay failures |
 
 ## Next implementation gates
 

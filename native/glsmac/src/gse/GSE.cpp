@@ -30,7 +30,9 @@ GSE::GSE()
 }
 
 GSE::~GSE() {
-	{
+	// Reachability traverses these containers on the GC worker. Mutate them
+	// under the same exclusion used for normal script execution.
+	m_gc_space->Accumulate( this, [ this ]() {
 		Finish();
 		for ( auto& it : m_include_cache ) {
 			it.second.Cleanup( this );
@@ -43,7 +45,7 @@ GSE::~GSE() {
 		m_async = nullptr;
 		m_modules.clear();
 		m_root_objects.clear();
-	}
+	}, nullptr, true );
 	delete m_gc_space;
 }
 
